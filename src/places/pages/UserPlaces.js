@@ -5,22 +5,22 @@ import { useParams } from "react-router-dom";
 export const DUMMY_PLACES = [
   {
     id: "p1",
-    title: "강남빌딩",
+    title: "서울 시청",
     description: "설명입니다",
     imageUrl:
       "https://img.freepik.com/free-vector/weather-icons-collection_1167-124.jpg?size=626&ext=jpg",
-    address: "1가",
-    location: { lat: 40.123, lng: -73 },
+    address: "서울 시청 주소~",
+    location: { lat: 37.5665, lng: 126.978 },
     creator: "u1",
   },
   {
     id: "p2",
-    title: "강남빌딩2",
+    title: "용산구청",
     description: "설명입니다",
     imageUrl:
       "https://img.freepik.com/free-vector/weather-icons-collection_1167-124.jpg?size=626&ext=jpg",
-    address: "1가",
-    location: { lat: 40.123, lng: -73 },
+    address: "용산구청주소~",
+    location: { lat: 37.5311, lng: 126.9815 },
     creator: "u2",
   },
 ];
