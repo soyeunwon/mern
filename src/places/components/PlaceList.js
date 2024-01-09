@@ -2,6 +2,7 @@ import React from "react";
 import "./PlaceList.css";
 import Card from "../../shared/components/UIElement/Card";
 import PlaceItem from "./PlaceItem";
+import Button from "../../shared/components/Form/Button";
 
 const PlaceList = (props) => {
   if (!props.items.length)
@@ -9,7 +10,7 @@ const PlaceList = (props) => {
       <div className="place-list center">
         <Card>
           <h2>장소를 찾을 수 없습니다. 추가하시겠습니까?</h2>
-          <button>Share Place</button>
+          <Button to="/places/new">추가</Button>
         </Card>
       </div>
     );
