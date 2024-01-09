@@ -7,9 +7,19 @@ import Map from "../../shared/components/UIElement/Map";
 
 const PlaceItem = (props) => {
   const [showMap, setShowMap] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const showMapHandler = () => {
     setShowMap(!showMap);
+  };
+
+  const showConfirmModalHandler = () => {
+    setShowConfirmModal(!showConfirmModal);
+  };
+
+  const confirmDeleteHandler = () => {
+    setShowConfirmModal(false);
+    console.log("delete...");
   };
 
   return (
@@ -26,6 +36,23 @@ const PlaceItem = (props) => {
           <Map center={props.coordinates} zoom={16} />
         </div>
       </Modal>
+      <Modal
+        show={showConfirmModal}
+        onCancel={showConfirmModalHandler}
+        footerClass="place-item__modal-actions"
+        footer={
+          <>
+            <Button inverse onClick={showConfirmModalHandler}>
+              취소
+            </Button>
+            <Button danger onClick={confirmDeleteHandler}>
+              삭제
+            </Button>
+          </>
+        }
+      >
+        <p>삭제하시겠습니까?</p>
+      </Modal>
       <li className="place-item">
         <Card className="place-item__content">
           <div className="place-item__image">
@@ -41,7 +68,9 @@ const PlaceItem = (props) => {
               지도보기
             </Button>
             <Button to={`/places/${props.id}`}>수정</Button>
-            <Button danger>삭제</Button>
+            <Button danger onClick={showConfirmModalHandler}>
+              삭제
+            </Button>
           </div>
         </Card>
       </li>
