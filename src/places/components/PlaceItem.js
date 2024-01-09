@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "./PlaceItem.css";
 import Card from "../../shared/components/UIElement/Card";
 import Button from "../../shared/components/Form/Button";
 import Modal from "../../shared/components/UIElement/Modal";
 import Map from "../../shared/components/UIElement/Map";
+import { AuthContext } from "../../shared/context/auth-context";
 
 const PlaceItem = (props) => {
+  const auth = useContext(AuthContext);
+
   const [showMap, setShowMap] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -67,10 +70,14 @@ const PlaceItem = (props) => {
             <Button inverse onClick={showMapHandler}>
               지도보기
             </Button>
-            <Button to={`/places/${props.id}`}>수정</Button>
-            <Button danger onClick={showConfirmModalHandler}>
-              삭제
-            </Button>
+            {auth.isLoggedIn && (
+              <>
+                <Button to={`/places/${props.id}`}>수정</Button>
+                <Button danger onClick={showConfirmModalHandler}>
+                  삭제
+                </Button>
+              </>
+            )}
           </div>
         </Card>
       </li>
