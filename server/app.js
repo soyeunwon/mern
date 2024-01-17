@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
 const placesRoutes = require("./routes/places-routes");
 const usersRoutes = require("./routes/users-routes");
@@ -25,4 +26,13 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "알 수 없는 에러 발생" });
 });
 
-app.listen(5050);
+mongoose
+  .connect(
+    "mongodb+srv://soyeunwondev:Lp432Jh9JUHHzlrO@cluster0.5b1bnup.mongodb.net/places?retryWrites=true&w=majority"
+  )
+  .then(() => {
+    app.listen(5050);
+  })
+  .catch((error) => {
+    console.log(error);
+  });
