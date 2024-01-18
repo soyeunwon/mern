@@ -1,11 +1,6 @@
-const uuid = require("uuid");
 const { validationResult } = require("express-validator");
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
-
-const DUMMY_USERS = [
-  { id: "u1", name: "soyeon", email: "test@test.com", password: "tester" },
-];
 
 const getUsers = async (req, res, next) => {
   let users;
@@ -13,7 +8,10 @@ const getUsers = async (req, res, next) => {
   try {
     users = await User.find({}, "-password");
   } catch (error) {
-    return next("유저 정보를 가져오는데 실패했습니다.", 500);
+    return next(
+      `유저 정보를 가져오는데 실패했습니다. Error Message:${error}`,
+      500
+    );
   }
 
   res.json({ users: users.map((user) => user.toObject({ getters: true })) });
@@ -22,17 +20,22 @@ const getUsers = async (req, res, next) => {
 const signup = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return next(new HttpError("유효하지 않은 데이터입니다.", 422));
+    return next(
+      new HttpError(`유효하지 않은 데이터입니다. Error Message:${error}`, 422)
+    );
   }
 
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
 
   let existingUser;
 
   try {
     existingUser = await User.findOne({ email: email });
   } catch (error) {
-    return next(new HttpError("가입에 실패했습니다."), 500);
+    return next(
+      new HttpError(`가입에 실패했습니다. Error Message:${error}`),
+      500
+    );
   }
 
   if (existingUser)
@@ -44,13 +47,15 @@ const signup = async (req, res, next) => {
     image:
       "https://img.freepik.com/free-vector/weather-icons-collection_1167-124.jpg?size=626&ext=jpg",
     password,
-    places,
+    places: [],
   });
 
   try {
     await createdUser.save();
   } catch (error) {
-    return next(new HttpError("가입에 실패했습니다.", 500));
+    return next(
+      new HttpError(`가입에 실패했습니다. Error Message:${error}`, 500)
+    );
   }
 
   res.status(201).json({ user: createdUser.toObject({ getters: true }) });
@@ -64,7 +69,10 @@ const login = async (req, res, next) => {
   try {
     existingUser = await User.findOne({ email: email });
   } catch (error) {
-    return next(new HttpError("로그인에 실패했습니다."), 500);
+    return next(
+      new HttpError(`로그인에 실패했습니다. Error Message:${error}`),
+      500
+    );
   }
 
   if (!existingUser || existingUser.password !== password)
