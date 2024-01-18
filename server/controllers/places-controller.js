@@ -27,20 +27,37 @@ let DUMMY_PLACES = [
   },
 ];
 
-const getPlaceById = (req, res, next) => {
+const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
-  const place = DUMMY_PLACES.find((place) => place.id === placeId);
 
-  if (!place) {
-    throw new HttpError("해당 ID에 대한 장소를 찾지 못했습니다.", 404);
+  let place;
+
+  try {
+    place = await Place.findById(placeId);
+  } catch (error) {
+    return next(
+      new HttpError("잘못된 요청입니다. 장소를 찾을 수 없습니다."),
+      500
+    );
   }
 
-  res.json({ place });
+  if (!place) {
+    return next(new HttpError("해당 ID에 대한 장소를 찾지 못했습니다.", 404));
+  }
+
+  res.json({ place: place.toObject({ getters: true }) });
 };
 
-const getPlacesByUserId = (req, res, next) => {
+const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
-  const places = DUMMY_PLACES.filter((place) => place.creator === userId);
+
+  let places;
+
+  try {
+    places = await Place.find({ creator: userId });
+  } catch (error) {
+    return next(new HttpError("장소가져오기에 실패했습니다."), 500);
+  }
 
   if (!places || !places.length) {
     return next(
@@ -48,7 +65,9 @@ const getPlacesByUserId = (req, res, next) => {
     );
   }
 
-  res.json({ places });
+  res.json({
+    places: places.map((place) => place.toObject({ getters: true })),
+  });
 };
 
 const createPlace = async (req, res, next) => {
@@ -86,7 +105,7 @@ const createPlace = async (req, res, next) => {
   res.status(201).json({ place: createdPlace });
 };
 
-const updatePlace = (req, res, next) => {
+const updatePlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new HttpError("유효하지 않은 데이터입니다.", 422);
@@ -95,28 +114,54 @@ const updatePlace = (req, res, next) => {
   const { title, description } = req.body;
   const placeId = req.params.pid;
 
-  const updatedPlace = {
-    ...DUMMY_PLACES.find((p) => p.id === placeId),
-    title,
-    description,
-  };
-  const placeIndex = DUMMY_PLACES.findIndex((p) => p.id === placeId);
+  let place;
 
-  DUMMY_PLACES[placeIndex] = updatedPlace;
-
-  res.status(200).json({ place: updatedPlace });
-};
-
-const deletePlace = (req, res, next) => {
-  const placeId = req.params.pid;
-
-  if (!DUMMY_PLACES.find((p) => p.id === placeId)) {
-    throw new HttpError("해당 장소id를 찾지 못했습니다.", 404);
+  try {
+    place = await Place.findById(placeId);
+  } catch (error) {
+    return next(
+      new HttpError("오류가 발생했습니다. 장소를 찾을 수 없습니다."),
+      500
+    );
   }
 
-  DUMMY_PLACES = DUMMY_PLACES.filter((p) => p.id !== placeId);
+  place.title = title;
+  place.description = description;
 
-  res.status(200).json({ message: "Deleted place", placeId: placeId });
+  try {
+    await place.save();
+  } catch (error) {
+    return next(
+      new HttpError("오류가 발생했습니다. 업데이트를 할 수 없습니다.", 500)
+    );
+  }
+
+  res.status(200).json({ place: place.toObject({ getters: true }) });
+};
+
+const deletePlace = async (req, res, next) => {
+  const placeId = req.params.pid;
+
+  let place;
+
+  try {
+    place = await Place.findById(placeId);
+  } catch (error) {
+    return next(
+      new HttpError("오류가 발생했습니다1. 삭제할 수 없습니다.", 500)
+    );
+  }
+
+  try {
+    await place.deleteOne();
+  } catch (error) {
+    console.log(error);
+    return next(
+      new HttpError("오류가 발생했습니다2. 삭제할 수 없습니다.", 500)
+    );
+  }
+
+  res.status(200).json({ message: "Deleted place" });
 };
 
 exports.getPlaceById = getPlaceById;
