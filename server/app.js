@@ -19,6 +19,7 @@ app.use((req, res, next) => {
 }); // 처리하고자 하는 요청이 아닌 경우에 실행. 요청이 보내지지 않음. (잘못된 EndPoint 등).
 
 app.use((error, req, res, next) => {
+  console.log(req);
   if (res.headerSent) {
     return next(error);
   }

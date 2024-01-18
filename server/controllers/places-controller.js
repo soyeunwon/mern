@@ -1,8 +1,8 @@
 const uuid = require("uuid");
 const { validationResult } = require("express-validator");
-
 const HttpError = require("../models/http-error");
 const getCoordsForAddress = require("../util/location");
+const Place = require("../models/place");
 
 let DUMMY_PLACES = [
   {
@@ -60,22 +60,28 @@ const createPlace = async (req, res, next) => {
   const { title, description, address, creator } = req.body;
 
   let coordinates;
+
   try {
     coordinates = await getCoordsForAddress(address);
   } catch (error) {
     return next(error);
   }
 
-  const createdPlace = {
-    id: uuid.v4(),
+  const createdPlace = new Place({
     title,
     description,
-    location: coordinates,
     address,
+    location: coordinates,
+    image:
+      "https://img.freepik.com/free-vector/weather-icons-collection_1167-124.jpg?size=626&ext=jpg",
     creator,
-  };
+  });
 
-  DUMMY_PLACES.push(createdPlace);
+  try {
+    await createdPlace.save();
+  } catch (error) {
+    return next(new HttpError("장소 생성에 실패했습니다.", 500));
+  }
 
   res.status(201).json({ place: createdPlace });
 };
