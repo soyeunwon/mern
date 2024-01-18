@@ -108,7 +108,7 @@ const createPlace = async (req, res, next) => {
 const updatePlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new HttpError("유효하지 않은 데이터입니다.", 422);
+    return next(new HttpError("유효하지 않은 데이터입니다.", 422));
   }
 
   const { title, description } = req.body;
