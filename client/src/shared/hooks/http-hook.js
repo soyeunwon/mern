@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 export const useHttpClient = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -9,7 +9,7 @@ export const useHttpClient = () => {
   const sendRequest = useCallback(
     async (url, method = "GET", body = null, headers = {}) => {
       setIsLoading(true);
-      const httpAbortCtrl = new AbortController();
+      const httpAbortCtrl = new AbortController(); // 비동기 웹 요청 중단 API | 페이지 전환, 중복된 요청 등을 중단하여 불필요한 리소스 방지
       activeHttpRequests.current.push(httpAbortCtrl);
 
       try {
@@ -17,7 +17,7 @@ export const useHttpClient = () => {
           method,
           body,
           headers,
-          signal,
+          signal: httpAbortCtrl.signal,
         });
 
         const responseData = await response.json();
