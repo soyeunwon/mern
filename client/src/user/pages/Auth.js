@@ -116,8 +116,8 @@ const Auth = () => {
             element="input"
             type="password"
             label="Password"
-            validators={[VALIDATOR_MINLENGTH(5)]}
-            errorText="유효한 비밀번호를 입력하세요. (5자 이상)"
+            validators={[VALIDATOR_MINLENGTH(6)]}
+            errorText="유효한 비밀번호를 입력하세요. (6자 이상)"
             onInput={inputHandler}
           />
           <Button type="submit" disabled={!formState.isValid}>

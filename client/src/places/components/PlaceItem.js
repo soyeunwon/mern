@@ -5,9 +5,13 @@ import Button from "../../shared/components/Form/Button";
 import Modal from "../../shared/components/UIElement/Modal";
 import Map from "../../shared/components/UIElement/Map";
 import { AuthContext } from "../../shared/context/auth-context";
+import { useHttpClient } from "../../shared/hooks/http-hook";
+import ErrorModal from "../../shared/components/UIElement/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElement/LoadingSpinner";
 
 const PlaceItem = (props) => {
   const auth = useContext(AuthContext);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
   const [showMap, setShowMap] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -20,13 +24,20 @@ const PlaceItem = (props) => {
     setShowConfirmModal(!showConfirmModal);
   };
 
-  const confirmDeleteHandler = () => {
+  const confirmDeleteHandler = async () => {
     setShowConfirmModal(false);
-    console.log("delete...");
+    try {
+      await sendRequest(
+        `http://localhost:5050/api/places/${props.id}`,
+        "DELETE"
+      );
+      props.onDelete(props.id);
+    } catch (err) {}
   };
 
   return (
     <>
+      <ErrorModal error={error} onClear={clearError} />
       <Modal
         show={showMap}
         onCancel={showMapHandler}
@@ -58,6 +69,7 @@ const PlaceItem = (props) => {
       </Modal>
       <li className="place-item">
         <Card className="place-item__content">
+          {isLoading && <LoadingSpinner asOverlay />}
           <div className="place-item__image">
             <img src={props.image} alt={props.title} />
           </div>
@@ -70,7 +82,7 @@ const PlaceItem = (props) => {
             <Button inverse onClick={showMapHandler}>
               지도보기
             </Button>
-            {auth.isLoggedIn && (
+            {auth.userId === props.creatorId && (
               <>
                 <Button to={`/places/${props.id}`}>수정</Button>
                 <Button danger onClick={showConfirmModalHandler}>
