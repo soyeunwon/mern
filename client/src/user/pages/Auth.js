@@ -13,6 +13,7 @@ import { AuthContext } from "../../shared/context/auth-context";
 import LoadingSpinner from "../../shared/components/UIElement/LoadingSpinner";
 import ErrorModal from "../../shared/components/UIElement/ErrorModal";
 import { useHttpClient } from "../../shared/hooks/http-hook";
+import ImageUpload from "../../shared/components/Form/ImageUpload";
 
 const Auth = () => {
   const auth = useContext(AuthContext);
@@ -65,7 +66,7 @@ const Auth = () => {
   const switchModeHandler = () => {
     if (!isLoginMode) {
       setFormData(
-        { ...formState.inputs, name: undefined },
+        { ...formState.inputs, name: undefined, image: undefined },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
     } else {
@@ -74,6 +75,10 @@ const Auth = () => {
           ...formState.inputs,
           name: {
             value: "",
+            isValid: false,
+          },
+          image: {
+            value: null,
             isValid: false,
           },
         },
@@ -101,6 +106,9 @@ const Auth = () => {
               errorText="이름을 입력해 주세요."
               onInput={inputHandler}
             />
+          )}
+          {!isLoginMode && (
+            <ImageUpload id="image" center onInput={inputHandler} />
           )}
           <Input
             id="email"
