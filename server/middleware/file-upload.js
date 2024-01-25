@@ -5,23 +5,23 @@ const MIME_TYPE_MAP = {
   "image/png": "png",
   "image/jpeg": "jpeg",
   "image/jpg": "jpg",
-}; //Multipurpose Internet Mail Extensions
+};
 
 const fileUpload = multer({
-  limits: 500000, //500kb
+  limits: 500000,
   storage: multer.diskStorage({
-    destination: (req, file, cd) => {
-      cd(null, "uploads/images");
-    }, //파일 저장될 위치를 제어
-    filename: (req, file, cd) => {
+    destination: (req, file, cb) => {
+      cb(null, "uploads/images");
+    },
+    filename: (req, file, cb) => {
       const ext = MIME_TYPE_MAP[file.mimetype];
-      cd(null, uuid.v1() + "." + ext);
+      cb(null, uuid.v1() + "." + ext);
     },
   }),
-  fileFilter: (req, file, cd) => {
+  fileFilter: (req, file, cb) => {
     const isValid = !!MIME_TYPE_MAP[file.mimetype];
-    let error = isValid ? null : new Error("유효하지 않은 파일 유형.");
-    cd(error, isValid);
+    let error = isValid ? null : new Error("Invalid mime type!");
+    cb(error, isValid);
   },
 });
 

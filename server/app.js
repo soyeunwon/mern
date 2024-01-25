@@ -1,6 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const fs = require("fs");
+const path = require("path");
 
 const placesRoutes = require("./routes/places-routes");
 const usersRoutes = require("./routes/users-routes");
@@ -9,6 +11,8 @@ const HttpError = require("./models/http-error");
 const app = express();
 
 app.use(bodyParser.json());
+
+app.use("/uploads/images", express.static(path.join("uploads", "images"))); //추가 확인 없이 서빙
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -30,6 +34,10 @@ app.use((req, res, next) => {
 }); // 처리하고자 하는 요청이 아닌 경우에 실행. 요청이 보내지지 않음. (잘못된 EndPoint 등).
 
 app.use((error, req, res, next) => {
+  if (req.file) {
+    fs.unlink(req.file.path, (err) => console.log(err)); //업로드 파일 롤백
+  }
+
   if (res.headerSent) {
     return next(error);
   }
