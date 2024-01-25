@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
 const HttpError = require("../models/http-error");
+const fs = require("fs");
 const getCoordsForAddress = require("../util/location");
 const Place = require("../models/place");
 const User = require("../models/user");
@@ -75,8 +76,7 @@ const createPlace = async (req, res, next) => {
     description,
     address,
     location: coordinates,
-    image:
-      "https://img.freepik.com/free-vector/weather-icons-collection_1167-124.jpg?size=626&ext=jpg",
+    image: req.file.path,
     creator,
   });
 
@@ -169,6 +169,8 @@ const deletePlace = async (req, res, next) => {
   if (!place)
     return next(new HttpError("해당 ID장소를 찾을 수 없습니다."), 404);
 
+  const imagePath = place.image;
+
   try {
     const sess = await mongoose.startSession();
     sess.startTransaction();
@@ -184,6 +186,8 @@ const deletePlace = async (req, res, next) => {
       )
     );
   }
+
+  fs.unlink(imagePath, (err) => console.log(err));
 
   res.status(200).json({ message: "Deleted place" });
 };
