@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
 
@@ -45,7 +46,7 @@ const signup = async (req, res, next) => {
   let hashedPassword;
   try {
     hashedPassword = await bcrypt.hash(password, 12);
-  } catch (err) {
+  } catch (error) {
     return next(
       new HttpError(`가입에 실패했습니다. Error Message:${error}`, 500)
     );
@@ -67,7 +68,22 @@ const signup = async (req, res, next) => {
     );
   }
 
-  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
+  let token;
+  try {
+    token = jwt.sign(
+      { userId: createdUser.id, email: createdUser.email },
+      "secret_dont_share",
+      { expiresIn: "2h" }
+    );
+  } catch (error) {
+    return next(
+      new HttpError(`가입에 실패했습니다. Error Message:${error}`, 500)
+    );
+  }
+
+  res
+    .status(201)
+    .json({ userId: createdUser.id, email: createdUser.email, token });
 };
 
 const login = async (req, res, next) => {
@@ -92,7 +108,7 @@ const login = async (req, res, next) => {
   let isValidPassword = false;
   try {
     isValidPassword = await bcrypt.compare(password, existingUser.password);
-  } catch (err) {
+  } catch (error) {
     return next(
       new HttpError("유효하지 않은 정보입니다. 로그인할 수 없습니다.", 500)
     );
@@ -103,10 +119,20 @@ const login = async (req, res, next) => {
       new HttpError("유효하지 않은 비밀번호입니다. 로그인할 수 없습니다.", 401)
     );
 
-  res.json({
-    message: "Logged in!",
-    user: existingUser.toObject({ getters: true }),
-  });
+  let token;
+  try {
+    token = jwt.sign(
+      { userId: existingUser.id, email: existingUser.email },
+      "secret_dont_share",
+      { expiresIn: "2h" }
+    );
+  } catch (error) {
+    return next(
+      new HttpError(`로그인에 실패했습니다. Error Message:${error}`, 500)
+    );
+  }
+
+  res.json({ userId: existingUser.id, email: existingUser.email, token });
 };
 
 exports.getUsers = getUsers;
