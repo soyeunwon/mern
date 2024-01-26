@@ -1,4 +1,5 @@
 const { validationResult } = require("express-validator");
+const bcrypt = require("bcryptjs");
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
 
@@ -41,11 +42,20 @@ const signup = async (req, res, next) => {
   if (existingUser)
     return next(new HttpError("이미 존재하는 사용자입니다."), 422);
 
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    return next(
+      new HttpError(`가입에 실패했습니다. Error Message:${error}`, 500)
+    );
+  }
+
   const createdUser = new User({
     name,
     email,
     image: req.file.path,
-    password,
+    password: hashedPassword,
     places: [],
   });
 
@@ -74,9 +84,23 @@ const login = async (req, res, next) => {
     );
   }
 
-  if (!existingUser || existingUser.password !== password)
+  if (!existingUser)
     return next(
       new HttpError("유효하지 않은 정보입니다. 로그인할 수 없습니다.", 401)
+    );
+
+  let isValidPassword = false;
+  try {
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+  } catch (err) {
+    return next(
+      new HttpError("유효하지 않은 정보입니다. 로그인할 수 없습니다.", 500)
+    );
+  }
+
+  if (!isValidPassword)
+    return next(
+      new HttpError("유효하지 않은 비밀번호입니다. 로그인할 수 없습니다.", 401)
     );
 
   res.json({
