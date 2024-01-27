@@ -102,7 +102,7 @@ const login = async (req, res, next) => {
 
   if (!existingUser)
     return next(
-      new HttpError("유효하지 않은 정보입니다. 로그인할 수 없습니다.", 401)
+      new HttpError("유효하지 않은 정보입니다. 로그인할 수 없습니다.", 403)
     );
 
   let isValidPassword = false;
@@ -116,7 +116,7 @@ const login = async (req, res, next) => {
 
   if (!isValidPassword)
     return next(
-      new HttpError("유효하지 않은 비밀번호입니다. 로그인할 수 없습니다.", 401)
+      new HttpError("유효하지 않은 비밀번호입니다. 로그인할 수 없습니다.", 403)
     );
 
   let token;

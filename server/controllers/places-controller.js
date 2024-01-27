@@ -133,6 +133,9 @@ const updatePlace = async (req, res, next) => {
     );
   }
 
+  if (place.creator.toString() !== req.userData.userId)
+    return next(new HttpError("장소를 수정할 수 없습니다.", 403));
+
   place.title = title;
   place.description = description;
 
@@ -168,6 +171,9 @@ const deletePlace = async (req, res, next) => {
 
   if (!place)
     return next(new HttpError("해당 ID장소를 찾을 수 없습니다."), 404);
+
+  if (place.creator.id !== req.userData.userId)
+    return next(new HttpError("장소를 삭제할 수 없습니다.", 403));
 
   const imagePath = place.image;
 
