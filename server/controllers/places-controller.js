@@ -61,7 +61,7 @@ const createPlace = async (req, res, next) => {
     return next(new HttpError("유효하지 않은 데이터입니다.", 422)); //express가 비동기로직에서 throw를 제대로 실행못하기 때문에 next로 처리
   }
 
-  const { title, description, address, creator } = req.body;
+  const { title, description, address } = req.body;
 
   let coordinates;
 
@@ -77,13 +77,13 @@ const createPlace = async (req, res, next) => {
     address,
     location: coordinates,
     image: req.file.path,
-    creator,
+    creator: req.userData.userId,
   });
 
   let user;
 
   try {
-    user = await User.findById(creator);
+    user = await User.findById(req.userData.userId);
   } catch (error) {
     return next(
       new HttpError(`장소 생성에 실패했습니다. Error Message:${error}`),
