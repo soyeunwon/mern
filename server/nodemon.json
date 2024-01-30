@@ -3,7 +3,7 @@
     "DB_USER": "soyeunwondev",
     "DB_PASSWORD": "Lp432Jh9JUHHzlrO",
     "DB_NAME": "mern",
-    "GOOGLE_API_KEY": "AIzaSyCw88YOeqKH4xTofWI-bJS1sUKAtzVNObU",
+    "GOOGLE_API_KEY": "AIzaSyApAAeCxqiRcPROG_voxIKQELBsi9PAfvs",
     "JWT_KEY": "secret_dont_share"
   }
 }
