@@ -7,18 +7,23 @@ import { useHttpClient } from "../../shared/hooks/http-hook";
 const Users = () => {
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [loadedUsers, setLoadedUsers] = useState([]);
+  console.log(process.env);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const responseData = await sendRequest(
-          "http://localhost:5050/api/users"
+          `http://localhost:5050/api/users`
         );
 
         setLoadedUsers(responseData.users);
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+      }
     };
     fetchUsers();
+
+    console.log(process.env);
   }, [sendRequest]);
 
   return (
