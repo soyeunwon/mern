@@ -1,0 +1,38 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: npm install
+        working-directory: ./server
+        run: npm install
+
+      - name: make zip file
+        working-directory: ./server
+        run: zip -r deploy.zip . -x "node_modules/*"
+
+      - name: Deploy to AWS Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v14
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: mern-project
+          environment_name: mern-project-env
+          region: ${{ secrets.AWS_REGION }}
+          version_label: ${{ github.SHA }}
+          deployment_package: ./server/deploy.zip
