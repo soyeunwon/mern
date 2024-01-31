@@ -1,0 +1,7 @@
+.git
+.gitignore 
+/client
+/node_modules
+.env
+env
+nodemon.json
