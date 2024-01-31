@@ -3,6 +3,9 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
+const dotenv = require("dotenv");
+
+const processEnv = dotenv.config().parsed;
 
 const getUsers = async (req, res, next) => {
   let users;
@@ -72,7 +75,7 @@ const signup = async (req, res, next) => {
   try {
     token = jwt.sign(
       { userId: createdUser.id, email: createdUser.email },
-      process.env.JWT_KEY,
+      processEnv.JWT_KEY,
       { expiresIn: "2h" }
     );
   } catch (error) {
@@ -123,7 +126,7 @@ const login = async (req, res, next) => {
   try {
     token = jwt.sign(
       { userId: existingUser.id, email: existingUser.email },
-      process.env.JWT_KEY,
+      processEnv.JWT_KEY,
       { expiresIn: "2h" }
     );
   } catch (error) {

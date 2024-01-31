@@ -7,7 +7,6 @@ import { useHttpClient } from "../../shared/hooks/http-hook";
 const Users = () => {
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [loadedUsers, setLoadedUsers] = useState([]);
-  console.log(process.env);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -22,8 +21,6 @@ const Users = () => {
       }
     };
     fetchUsers();
-
-    console.log(process.env);
   }, [sendRequest]);
 
   return (

@@ -3,12 +3,14 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const path = require("path");
+const dotenv = require("dotenv");
 
 const placesRoutes = require("./routes/places-routes");
 const usersRoutes = require("./routes/users-routes");
 const HttpError = require("./models/http-error");
 
 const app = express();
+const processEnv = dotenv.config().parsed;
 
 app.use(bodyParser.json());
 
@@ -47,10 +49,10 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.5b1bnup.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
+    `mongodb+srv://${processEnv.DB_USER}:${processEnv.DB_PASSWORD}@cluster0.5b1bnup.mongodb.net/${processEnv.DB_NAME}?retryWrites=true&w=majority`
   )
   .then(() => {
-    app.listen(process.env.PORT || 5050);
+    app.listen(processEnv.PORT || 5050);
   })
   .catch((error) => {
     console.log(error);
