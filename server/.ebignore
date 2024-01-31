@@ -2,6 +2,6 @@
 .gitignore 
 /client
 /node_modules
-.env
 env
+.env
 nodemon.json
